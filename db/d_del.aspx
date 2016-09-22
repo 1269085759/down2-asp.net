@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="d_del.aspx.cs" Inherits="down2.db.d_del" %>
