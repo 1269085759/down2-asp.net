@@ -90,12 +90,15 @@ function FileDownloader(fileLoc, mgr)
         this.browser.stopFile(this.fileSvr);
     };
 
-    this.delete = function ()
+    this.remove = function ()
     {
         this.browser.stopFile(this.fileSvr);
         //从上传列表中删除
         this.ui.split.remove();
         this.ui.div.remove();
+        //
+        this.Manager.remove_url(this.fileSvr.fileUrl);
+
         this.svr_delete();
     };
 
@@ -174,14 +177,14 @@ function FileDownloader(fileLoc, mgr)
         });
     };
 
-    this.down_complete = function ()
+    this.down_complete = function (json)
     {
         this.hideBtns();
         this.event.downComplete(this);//biz event
         //this.ui.btn.del.text("打开");
         this.ui.process.css("width", "100%");
         this.ui.percent.text("(100%)");
-        this.ui.msg.text("下载完成");
+        this.ui.msg.text("下载完成 耗时："+json.time);
         this.State = HttpDownloaderState.Complete;
         this.svr_delete();
         this.Manager.filesCmp.push(this);

@@ -179,7 +179,7 @@ function DownloaderMgr()
 	{
 	    $.each(this.filesCmp, function (i,n)
 	    {
-	        n.delete();
+	        n.remove();
 	    });
 	    this.filesCmp.length = 0;
 	};
@@ -230,10 +230,10 @@ function DownloaderMgr()
 	    uiMsg.text("");
 	    uiSize.text("0字节");
 	    uiPercent.text("(0%)");
-	    btnDel.click(function () { downer.delete(); });
+	    btnDel.click(function () { downer.remove(); });
 	    btnStop.click(function () { downer.stop(); });
 	    btnDown.click(function () { downer.down(); });
-	    btnCancel.click(function () { downer.delete(); });
+	    btnCancel.click(function () { downer.remove(); });
 
 	    downer.ready(); //准备
 	    return downer;
