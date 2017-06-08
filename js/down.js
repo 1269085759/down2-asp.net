@@ -1,25 +1,24 @@
 ﻿/*
-版权所有(C) 2009-2015 荆门泽优软件有限公司
+版权所有(C) 2009-2017 荆门泽优软件有限公司
 保留所有权利
 官方网站：http://www.ncmem.com
-官方博客：http://www.cnblogs.com/xproer
-产品首页：http://www.ncmem.com/webplug/http-downloader/index.asp
-在线演示：http://www.ncmem.com/products/http-downloader/demo/index.html
+产品论坛：http://bbs.ncmem.com/forum-41-1.html
+产品首页：http://www.ncmem.com/webapp/down2/index.asp
 开发文档：http://www.cnblogs.com/xproer/archive/2011/03/15/1984950.html
 升级日志：http://www.cnblogs.com/xproer/archive/2011/03/15/1985091.html
-示例下载(asp.net)：http://www.ncmem.com/download/HttpDownloader/asp.net/demo.rar
-示例下载(jsp-access)：http://www.ncmem.com/download/HttpDownloader/jsp/HttpDownloader.rar
-示例下载(jsp-mysql)：http://www.ncmem.com/download/HttpDownloader/jsp/HttpDownloaderMySQL.rar
-示例下载(jsp-oracle)：http://www.ncmem.com/download/HttpDownloader/jsp/HttpDownloaderOracle.rar
-示例下载(jsp-sql)：http://www.ncmem.com/download/HttpDownloader/jsp/HttpDownloaderSQL.rar
-示例下载(php)：http://www.ncmem.com/download/HttpDownloader/php/HttpDownloader.rar
-文档下载：http://www.ncmem.com/download/HttpDownloader/HttpDownloader-doc.rar
+示例下载(asp.net)：http://www.ncmem.com/download/down2/asp.net/down2.rar
+示例下载(jsp-mysql)：http://www.ncmem.com/download/down2/jsp/Down2MySQL.rar
+示例下载(jsp-oracle)：http://www.ncmem.com/download/down2/jsp/Down2Oracle.rar
+示例下载(jsp-sql)：http://www.ncmem.com/download/down2/jsp/Down2SQL.rar
+示例下载(php)：http://www.ncmem.com/download/down2/php/down2.rar
+文档下载：http://www.ncmem.com/download/down2/down2-doc.rar
 联系邮箱：1085617561@qq.com
 联系QQ：1085617561
 更新记录：
     2009-11-05 创建
 	2014-02-27 优化版本号。
     2015-08-13 优化
+    2017-06-08 增加对edge的支持，完善逻辑。
 */
 function debug_msg(v) { $(document.body).append("<div>"+v+"</div>");}
 //删除元素值
@@ -50,13 +49,13 @@ function DownloaderMgr()
 		, "DataBase"	: false//启用数据库支持
 		, "FilePart"	: 1048576//文件块大小，更新进度时使用，计算器：http://www.beesky.com/newsite/bit_byte.htm
         //file
-        , "UrlCreate"   : "http://localhost:1106/db/d_create.aspx"
-        , "UrlDel"      : "http://localhost:1106/db/d_del.aspx"
-        , "UrlList"     : "http://localhost:1106/db/d_list.aspx"
-        , "UrlUpdate"   : "http://localhost:1106/db/d_update.aspx"
-        , "UrlDown"     : "http://localhost:87/demoSql2005/down2/db/f_down.aspx"
+        , "UrlCreate"   : "http://localhost:90/db/d_create.aspx"
+        , "UrlDel"      : "http://localhost:90/db/d_del.aspx"
+        , "UrlList"     : "http://localhost:90/db/d_list.aspx"
+        , "UrlUpdate"   : "http://localhost:90/db/d_update.aspx"
+        , "UrlDown"     : "http://localhost:90/db/f_down.aspx"
 	    //folder
-        , "UrlFdCreate" : "http://localhost:87/demoSql2005/down2/db/fd_create.aspx"
+        , "UrlFdCreate" : "http://localhost:90/db/fd_create.aspx"
         //x86
         , ie: {
               part: { clsid: "6528602B-7DF7-445A-8BA0-F6F996472569", name: "Xproer.DownloaderPartition" }
