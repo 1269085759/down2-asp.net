@@ -23,11 +23,11 @@ var HttpDownloaderState = {
 function FileDownloader(fileLoc, mgr)
 {
     var _this = this;
-    this.ui = { msg: null, process: null, percent: null, btn: {del:null,cancel:null,post:null,stop:null},div:null,split:null};
-    this.browser = mgr.browser;
+    this.ui = { msg: null, process: null, percent: null, btn: {del:null,cancel:null,down:null,stop:null},div:null,split:null};
+    this.app = mgr.app;
     this.Manager = mgr;
     this.Config = mgr.Config;
-    this.fields = jQuery.extend({},mgr.Fields);//每一个对象自带一个fields幅本
+    this.fields = jQuery.extend({},mgr.Config.Fields);//每一个对象自带一个fields幅本
     this.State = HttpDownloaderState.None;
     this.event = mgr.event;
     this.fileSvr = {
@@ -39,9 +39,11 @@ function FileDownloader(fileLoc, mgr)
         , pathLoc: ""
         , fileUrl:""
         , lenLoc: 0
+        , perLoc: "0%"
         , lenSvr: 0
         , sizeSvr:"0byte"
         , complete: false
+        , fdTask: false
     };
     jQuery.extend(this.fileSvr, fileLoc);//覆盖配置
 
@@ -57,6 +59,7 @@ function FileDownloader(fileLoc, mgr)
     this.ready = function ()
     {
         this.hideBtns();
+        this.ui.btn.down.show();
         this.ui.btn.cancel.show();
         //this.pButton.style.display = "none";
         this.ui.msg.text("正在下载队列中等待...");
@@ -65,7 +68,7 @@ function FileDownloader(fileLoc, mgr)
 
     this.addQueue = function ()
     {
-        this.browser.addFile(this.fileSvr);
+        this.app.addFile(this.fileSvr);
     };
 
     //方法-开始下载
@@ -75,7 +78,7 @@ function FileDownloader(fileLoc, mgr)
         this.ui.btn.stop.show();
         this.ui.msg.text("开始连接服务器...");
         this.State = HttpDownloaderState.Posting;
-        this.browser.addFile(this.fileSvr);
+        this.app.addFile(this.fileSvr);
         this.Manager.start_queue();//下载队列
     };
 
@@ -87,29 +90,27 @@ function FileDownloader(fileLoc, mgr)
         //this.SvrUpdate();
         this.State = HttpDownloaderState.Stop;
         this.ui.msg.text("下载已停止");
-        this.browser.stopFile(this.fileSvr);
+        this.app.stopFile(this.fileSvr);
     };
 
     this.remove = function ()
     {
-        this.browser.stopFile(this.fileSvr);
+        this.app.stopFile(this.fileSvr);
         //从上传列表中删除
         this.ui.split.remove();
         this.ui.div.remove();
-        //
         this.Manager.remove_url(this.fileSvr.fileUrl);
-
         this.svr_delete();
     };
 
     this.open = function ()
     {
-        this.browser.openFile(this.fileSvr);
+        this.app.openFile(this.fileSvr);
     };
 
     this.openPath = function ()
     {
-        this.browser.openPath(this.fileSvr);
+        this.app.openPath(this.fileSvr);
     };
 
     //在出错，停止中调用
@@ -125,7 +126,7 @@ function FileDownloader(fileLoc, mgr)
             , jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
             , url: _this.Config["UrlUpdate"]
             , data: param
-            , success: function (msg){}
+            , success: function (msg) { }
             , error: function (req, txt, err) { alert("更新下载信息失败！" + req.responseText); }
             , complete: function (req, sta) { req = null; }
         });
@@ -137,7 +138,8 @@ function FileDownloader(fileLoc, mgr)
         if (!this.Config.DataBase) return;//
         //已记录将不再记录
         if (this.fileSvr.idSvr) return;
-        var param = jQuery.extend({}, this.fields, {file:encodeURIComponent(JSON.stringify(this.fileSvr)), time: new Date().getTime() });
+        var param = jQuery.extend({}, this.fields, this.fileSvr, { time: new Date().getTime() });
+        jQuery.extend(param, {pathLoc:encodeURIComponent(this.fileSvr.pathLoc),nameLoc:encodeURIComponent(this.fileSvr.nameCustom)});
 
         $.ajax({
             type: "GET"
@@ -149,8 +151,9 @@ function FileDownloader(fileLoc, mgr)
             {
                 if (msg.value == null) return;
                 var json = JSON.parse(decodeURIComponent(msg.value));
-                jQuery.extend(true, _this.fileSvr, json);
-                //if (_this.isComplete()) { _this.SvrDelete(); }
+                _this.fileSvr.idSvr = json.idSvr;
+                //文件已经下载完
+                //if (_this.isComplete()) { _this.svr_delete(); }
             }
             , error: function (req, txt, err) { alert("创建信息失败！" + req.responseText); }
             , complete: function (req, sta) { req = null; }
@@ -170,24 +173,31 @@ function FileDownloader(fileLoc, mgr)
             , data: param
             , success: function (json)
             {
-                //var res = eval(msg);
+                //_this.fileSvr.idSvr = json.idSvr;
+                //_this.fileSvr.uid = json.uid;
             }
             , error: function (req, txt, err) { alert("删除数据错误！" + req.responseText); }
             , complete: function (req, sta) { req = null; }
         });
     };
 
-    this.down_complete = function (json)
+    this.down_complete = function ()
     {
         this.hideBtns();
         this.event.downComplete(this);//biz event
         //this.ui.btn.del.text("打开");
         this.ui.process.css("width", "100%");
         this.ui.percent.text("(100%)");
-        this.ui.msg.text("下载完成 耗时："+json.time);
+        this.ui.msg.text("下载完成");
         this.State = HttpDownloaderState.Complete;
-        this.svr_delete();
+        //this.SvrDelete();
         this.Manager.filesCmp.push(this);
+
+        if (this.fileSvr.idSvr > 0)
+        {
+            this.svr_delete();
+        }
+
     };
 
     this.down_recv_size = function (json)
@@ -227,7 +237,7 @@ function FileDownloader(fileLoc, mgr)
     {
         var lenSvr = this.fileSvr.lenSvr;
         var filePart = this.Config["FilePart"];
-        if (lenSvr > filePart && 0 == this.fileSvr.idSvr)
+        if (lenSvr > filePart && 0==this.fileSvr.idSvr)
         {
             this.svr_create();
         }
@@ -242,5 +252,13 @@ function FileDownloader(fileLoc, mgr)
         this.ui.msg.text(DownloadErrorCode[json.code+""]);
         this.State = HttpDownloaderState.Error;
         //this.SvrUpdate();
+    };
+
+    this.down_stoped = function (json)
+    {
+        this.hideBtns();
+        this.ui.btn.down.show();
+        this.ui.btn.del.show();
+        //this.svr_update();
     };
 }

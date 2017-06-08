@@ -5,8 +5,10 @@
     <title>donw2-多文件演示页面</title>
     <link type="text/css" href="js/down.css" rel="Stylesheet" />
     <script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
-    <script type="text/javascript" src="js/down.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/down.app.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/down.edge.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/down.file.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/down.js" charset="utf-8"></script>
 </head>
 <body>
     <input type="button" value="下载测试文件" onclick="StartDown()" />
@@ -21,7 +23,7 @@
         downer.event.downError = function (obj, err) { };
         downer.event.queueComplete = function () { $(document.body).append("<div>队列完成</div>"); };
 
-    	$(document).ready(function ()
+    	$( function ()
     	{
     	    downer.loadTo("downDiv");
     	});
